@@ -1,3 +1,4 @@
+import { useForm } from "react-hook-form";
 import {
   Button,
   Divisor,
@@ -13,20 +14,49 @@ import {
   UploadLabel,
   UploadTitulo,
 } from "../../components";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const esquemaCadastroEnderecoEspecilista = z.object({
+  endereco: z.object({
+    cep: z.string().min(9, "Informe um CEP válido"),
+    rua: z.string().min(1, "Informe uma rua válida"),
+    numero: z.coerce.number().min(1, "Informe um número válido"),
+    bairro: z.string().min(1, "Informe um bairro válido"),
+    localidade: z.string().min(1, "Informe uma localidade válida"),
+  }),
+});
+
+type FormCadastroEnderecoEspecialista = z.infer<
+  typeof esquemaCadastroEnderecoEspecilista
+>;
 
 const CadastroEspecialistaEndereco = () => {
+  const { register, handleSubmit } = useForm<FormCadastroEnderecoEspecialista>({
+    resolver: zodResolver(esquemaCadastroEnderecoEspecilista),
+    defaultValues: {
+      endereco: {
+        cep: "",
+        rua: "",
+        numero: 0,
+        bairro: "",
+        localidade: "",
+      },
+    },
+  });
+
   return (
     <>
       <Titulo className="titulo">Para finalizar, só alguns detalhes!</Titulo>
       <Form>
-        <div>
+        <>
           <UploadTitulo>Sua foto</UploadTitulo>
           <UploadLabel htmlFor="campo-upload">
             <UploadIcon />
             <UploadDescription>Clique para enviar</UploadDescription>
             <UploadInput accept="image/*" id="campo-upload" type="file" />
           </UploadLabel>
-        </div>
+        </>
 
         <Divisor />
         <Fieldset>

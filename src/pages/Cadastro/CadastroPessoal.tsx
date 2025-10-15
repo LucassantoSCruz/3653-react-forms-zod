@@ -14,7 +14,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 const esquemaCadastro = z
   .object({
-    nome: z.string().min(5, "O nome deve ter ao menos cinco caracteres"),
+    nome: z
+      .string()
+      .min(5, "O nome deve ter ao menos cinco caracteres")
+      .transform((val) =>
+        val.replace(
+          /\w\S*/g,
+          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        )
+      ),
     email: z
       .string()
       .min(1, "O campo é obrigatório")
