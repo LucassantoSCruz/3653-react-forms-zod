@@ -1,7 +1,7 @@
-import { useForm } from "react-hook-form";
 import {
   Button,
   Divisor,
+  ErrorMessage,
   Fieldset,
   Form,
   FormContainer,
@@ -14,68 +14,83 @@ import {
   UploadLabel,
   UploadTitulo,
 } from "../../components";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-
-const esquemaCadastroEnderecoEspecilista = z.object({
-  endereco: z.object({
-    cep: z.string().min(9, "Informe um CEP válido"),
-    rua: z.string().min(1, "Informe uma rua válida"),
-    numero: z.coerce.number().min(1, "Informe um número válido"),
-    bairro: z.string().min(1, "Informe um bairro válido"),
-    localidade: z.string().min(1, "Informe uma localidade válida"),
-  }),
-});
-
-type FormCadastroEnderecoEspecialista = z.infer<
-  typeof esquemaCadastroEnderecoEspecilista
->;
+import useCep from "../../hooks/useCep";
 
 const CadastroEspecialistaEndereco = () => {
-  const { register, handleSubmit } = useForm<FormCadastroEnderecoEspecialista>({
-    resolver: zodResolver(esquemaCadastroEnderecoEspecilista),
-    defaultValues: {
-      endereco: {
-        cep: "",
-        rua: "",
-        numero: 0,
-        bairro: "",
-        localidade: "",
-      },
-    },
-  });
+  const { register, handleSubmit, aoSubmeter, errors } = useCep();
 
   return (
     <>
       <Titulo className="titulo">Para finalizar, só alguns detalhes!</Titulo>
-      <Form>
+      <Form onSubmit={handleSubmit(aoSubmeter)}>
         <>
           <UploadTitulo>Sua foto</UploadTitulo>
           <UploadLabel htmlFor="campo-upload">
             <UploadIcon />
             <UploadDescription>Clique para enviar</UploadDescription>
-            <UploadInput accept="image/*" id="campo-upload" type="file" />
+            <UploadInput
+              accept="image/*"
+              id="campo-upload"
+              type="file"
+              {...register("endereco.avatar")}
+            />
           </UploadLabel>
+          {errors.endereco?.avatar && (
+            <ErrorMessage>{errors.endereco?.avatar?.message}</ErrorMessage>
+          )}
         </>
 
         <Divisor />
         <Fieldset>
           <Label htmlFor="campo-cep">CEP</Label>
-          <Input id="campo-cep" placeholder="Insira seu CEP" type="text" />
+          <Input
+            id="campo-cep"
+            placeholder="Insira seu CEP"
+            type="text"
+            $error={!!errors.endereco?.cep}
+            {...register("endereco.cep")}
+          />
+          {errors.endereco?.cep && (
+            <ErrorMessage>{errors.endereco?.cep?.message}</ErrorMessage>
+          )}
         </Fieldset>
         <Fieldset>
           <Label htmlFor="campo-rua">Rua</Label>
-          <Input id="campo-rua" placeholder="Rua Agarikov" type="text" />
+          <Input
+            id="campo-rua"
+            placeholder="Rua Agarikov"
+            type="text"
+            {...register("endereco.rua")}
+          />
+          {errors.endereco?.rua && (
+            <ErrorMessage>{errors.endereco?.rua?.message}</ErrorMessage>
+          )}
         </Fieldset>
 
         <FormContainer>
           <Fieldset>
             <Label htmlFor="campo-numero-rua">Número</Label>
-            <Input id="campo-numero-rua" placeholder="Ex: 1440" type="text" />
+            <Input
+              id="campo-numero-rua"
+              placeholder="Ex: 1440"
+              type="text"
+              {...register("endereco.numero")}
+            />
+            {errors.endereco?.numero && (
+              <ErrorMessage>{errors.endereco?.numero.message}</ErrorMessage>
+            )}
           </Fieldset>
           <Fieldset>
             <Label htmlFor="campo-bairro">Bairro</Label>
-            <Input id="campo-bairro" placeholder="Vila Mariana" type="text" />
+            <Input
+              id="campo-bairro"
+              placeholder="Vila Mariana"
+              type="text"
+              {...register("endereco.bairro")}
+            />
+            {errors.endereco?.bairro && (
+              <ErrorMessage>{errors.endereco?.bairro.message}</ErrorMessage>
+            )}
           </Fieldset>
         </FormContainer>
         <Fieldset>
@@ -84,7 +99,11 @@ const CadastroEspecialistaEndereco = () => {
             id="campo-localidade"
             placeholder="São Paulo, SP"
             type="text"
+            {...register("endereco.localidade")}
           />
+          {errors.endereco?.localidade && (
+            <ErrorMessage>{errors.endereco?.localidade.message}</ErrorMessage>
+          )}
         </Fieldset>
         <Button type="submit">Cadastrar</Button>
       </Form>
